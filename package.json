@@ -24,7 +24,6 @@
     "lint": "ng lint",
     "e2e": "ng e2e"
   },
-  "main": "server.js",
   "repository": {
     "type": "git",
     "url": "git://github.com/mika-el/angular-admin-lte.git"
