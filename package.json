@@ -22,7 +22,8 @@
     "test:demo": "ng test angular-admin-lte-demo",
     "test:lib": "ng test angular-admin-lte",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "postinstall": "npm run build"
   },
   "repository": {
     "type": "git",
