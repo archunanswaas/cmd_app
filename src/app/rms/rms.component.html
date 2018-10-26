@@ -1,0 +1,368 @@
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-sm-12" >
+    <div class="box">
+        <div class="box-header">
+          <h3 class="box-title"></h3>
+          <div class="box-tools">
+            <button class="btn btn-primary pull-right" (click)="validateananalyze()" >Validate & Analyze New File</button>
+          </div>
+          <br>
+        </div>
+        
+        <!-- /.box-header --> 
+        <div class="box-body">
+          <table class="table table-bordered" >
+            <tr>
+              <th style="width: 10px">#</th>
+              <th>RMS Run date</th>
+              <th>Uploaded File Name</th>
+              <th>Platform Name</th>
+              <th>Campaign Name</th>
+              <th>Account Name</th>
+              <th>Total Records</th> 
+              <th>Rejected Records</th>
+              <th>Matched Records</th>
+              <th>Not Matched Records</th>
+              <th>Uploaded By</th>
+              <th>Uploaded Date</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          
+           <tbody *ngIf="rundetailsData?.length; else NoDataFound" >
+            <tr *ngFor="let item of rundetailsData; let i=index">
+                <td>{{i+1}}</td>
+                <td>{{item.Run_DateTime | date: 'MM-dd-yyyy'  }}</td>
+                <td>{{item.Upload_File_Name}}</td>
+                <td>
+                    <div *ngIf="is_empty(item.platfrom_name); then Hiphen else platfrom_name"></div>
+                    <ng-template #platfrom_name>
+                        <p>{{item.platfrom_name}}</p>
+                    </ng-template>
+                </td>
+                <td>
+                    <div *ngIf="is_empty(item.account_name); then Hiphen else account_name"></div>
+                    <ng-template #account_name>
+                        <p>{{item.account_name}}</p>
+                    </ng-template>
+                </td>
+                <td>
+                    <div *ngIf="is_empty(item.campaign_name); then Hiphen else campaign_name"></div>
+                    <ng-template #campaign_name>
+                        <p>{{item.campaign_name}}</p>
+                    </ng-template>
+                </td>
+                <td>{{item.TotalNumberOfRecords}}</td>
+                <td>{{item.TotalNumberOfRejectedRecords}}</td>
+                <td>{{item.TotalNumberOfFoundRecords}}</td>
+                <td>{{item.TotalNumberOfNOTFoundRecords}}</td>
+                <td>{{item.Uploaded_By}}</td> 
+                <td>{{item.Upload_Datetime | date: 'MM-dd-yyyy' }}</td>
+                <td>
+                    <div *ngIf="is_completed(item); then Completed else Pending"></div>
+                    <ng-template #Completed>
+                        <!-- <button class="btn btn-success btn-xs" style="width: 70px;" >Completed</button> -->
+                        <p style="color:green">Completed</p>
+                    </ng-template>
+                    <ng-template #Pending>
+                        <!-- <button class="btn btn-warning btn-xs" style="width: 70px;" >Pending</button> -->
+                        <p style="color:orange">Pending</p>
+                    </ng-template> 
+                  
+                </td>
+                <td>
+                    <div *ngIf="is_completed(item); then ViewReport else Resume"></div>
+                    <ng-template #ViewReport>
+                        <button  class="btn btn-info btn-sm" (click)="view_report_modal(item,ViewReportModal)" style="width: 87px;" >View Report</button>
+                        <button  class="btn btn-default btn-sm" (click)="RMSExportOptionSelectModal(item,RMSExportModal)" style="width: 87px;margin-top: 10px;" >Export</button>
+                       
+                    </ng-template>
+                    <ng-template #Resume>
+                        <button class="btn btn-info btn-sm" (click)="resume(item)" style="width: 87px;" >Resume</button>
+                    </ng-template> 
+                </td>
+            </tr>
+            </tbody>
+           
+           
+          </table>
+        </div>
+        <!-- /.box-body -->
+       
+      </div>
+    </div>
+    
+</div>
+
+ <ng-template #NoDataFound >
+    <tr>
+        <td colspan="14" >No data found...</td>
+    </tr>
+</ng-template> 
+
+<ng-template #Hiphen>
+        <p>--</p>
+</ng-template> 
+
+<ng-template #RMSExportModal>
+  
+    <div class="modal-content">
+        
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">Please select option to Export</h4>
+        </div>
+
+        <div class="modal-body">
+            <form [formGroup]="RMSExportFilterForm" class="form-horizontal" (ngSubmit)="exportRMSRunXLSX()"  >
+                <div class="row">
+                    <div class="col-md-10 col-xs-12"> 
+                    <table >
+                        <tr>
+                        <label class="radio-inline">
+                        <input type="radio" value="2" formControlName="RMSExportFilterCheckBox" name="RMSExportFilterCheckBox"  >All
+                        </label>
+                        </tr>
+                        <tr>
+                        <label class="radio-inline">
+                        <input type="radio" value="0" formControlName="RMSExportFilterCheckBox" name="RMSExportFilterCheckBox">Matched Records
+                        </label>
+                        </tr>
+                        <tr>
+                        <label class="radio-inline">
+                        <input type="radio" value="1" formControlName="RMSExportFilterCheckBox" name="RMSExportFilterCheckBox">Not Matched Records
+                        </label>
+                        
+                        <div *ngIf="is_submitted_rms_export_form && RMSExportFilterFormData.RMSExportFilterCheckBox.errors" class="invalid-feedback">
+                                <div *ngIf="RMSExportFilterFormData.RMSExportFilterCheckBox.errors.required" style="color: red;" >Please select option</div>
+                        </div>
+
+                    </table>
+                </div>
+                </div>
+    
+                <div class="modal-footer">
+                <button type="submit" class="btn btn-success"  >Submit</button>
+                <button type="button" class="btn btn-danger" (click)="CloseModal()" >Cancel</button>
+                </div>
+            </form>
+        </div>
+        
+    </div>
+              
+</ng-template>
+
+
+<ng-template #ValidateExportModal>
+  
+        <div class="modal-content">
+            
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Please select option to Export</h4>
+            </div>
+    
+            <div class="modal-body">
+                <form [formGroup]="ValidateExportFilterForm" class="form-horizontal" (ngSubmit)="exportValidationRunXLSX()"  >
+                    <div class="row">
+                        <div class="col-md-10 col-xs-12"> 
+                        <table >
+                            <tr>
+                            <label class="radio-inline">
+                            <input type="radio" value="2" formControlName="ValidateExportFilterCheckBox" name="ValidateExportFilterCheckBox" >All
+                            </label>
+                            </tr>
+                            <tr>
+                            <label class="radio-inline">
+                            <input type="radio" value="0" formControlName="ValidateExportFilterCheckBox" name="ValidateExportFilterCheckBox" >Valid Records
+                            </label>
+                            </tr>
+                            <tr>
+                            <label class="radio-inline">
+                            <input type="radio" value="1" formControlName="ValidateExportFilterCheckBox" name="ValidateExportFilterCheckBox" >Rejected Records
+                            </label>
+                            <div *ngIf="is_submitted_validate_export_form && ValidateExportFilterFormData.ValidateExportFilterCheckBox.errors" class="invalid-feedback">
+                                    <div *ngIf="ValidateExportFilterFormData.ValidateExportFilterCheckBox.errors.required" style="color: red;" >Please select option</div>
+                                </div>
+                        </table>
+                    </div>
+                    </div>
+        
+                    <div class="modal-footer">
+                    <button type="submit" class="btn btn-success"  >Submit</button>
+                    <button type="button" class="btn btn-danger" (click)="CloseModal()" >Cancel</button>
+                    </div>
+                </form>
+            </div>
+            
+        </div>
+                  
+    </ng-template>
+
+
+<ng-template #ViewReportModal>
+  
+        <div class="modal-content">
+            
+            <div class="modal-header">
+                <h4 class="modal-title pull-left">View Report</h4>
+                    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+            </div>
+
+            <div class="modal-body">
+                  
+                          
+                <div class="row">
+                    <div class="col-md-12">
+                        <mk-box header="Run Info"  boxColor="success" [isCollapsable]="false" [isRemovable]="false" [isRemovable]="false" [isSolid]="true" >
+                        <!-- <div *ngIf="validationRunInfo.length > 0; else NoDataFound" class="box-body"> -->
+                        <div  class="box-body">
+                            <table  class="table table-bordered">
+                            <tr style="background-color:#f9f9f9" >
+                                <th>Platform Name</th>
+                                <th>Campaign Name</th>
+                                <th>Account Name</th>
+                                <th>Uploaded File Name</th>
+                                <th>Run Date</th>
+                                <th>Run By</th>
+                            </tr>
+                            <tr>
+                               
+                                <td>
+                                    <div *ngIf="is_empty(validationRunInfo[0].platfrom_name); then Hiphen else platfrom_name"></div>
+                                    <ng-template #platfrom_name>
+                                        <p>{{validationRunInfo[0].platfrom_name}}</p>
+                                    </ng-template>
+                                </td>
+                                <td>
+                                    <div *ngIf="is_empty(validationRunInfo[0].campaign_name); then Hiphen else account_name"></div>
+                                    <ng-template #account_name>
+                                        <p>{{validationRunInfo[0].campaign_name}}</p>
+                                    </ng-template>
+                                </td>
+                                <td>
+                                    <div *ngIf="is_empty(validationRunInfo[0].account_name); then Hiphen else campaign_name"></div>
+                                    <ng-template #campaign_name>
+                                        <p>{{validationRunInfo[0].account_name}}</p>
+                                    </ng-template>
+                                </td>
+
+                                <td>{{validationRunInfo[0].File_Name}}</td>
+                                <td>{{validationRunInfo[0].Upload_Datetime | date: 'MM-dd-yyyy' }}</td>
+                                <td>{{validationRunInfo[0].uploaded_by}}</td>
+                            </tr>
+                            </table>
+                        </div>
+                        </mk-box>
+                    </div>
+                    </div>
+                   
+                    <div class="row">
+                    <div class="col-md-12">
+                        <mk-box header="Step1 - Validation Run Summary"  boxColor="primary" [isCollapsable]="false" [isRemovable]="false" [isRemovable]="false" [isSolid]="true" >
+                        <!-- <div *ngIf="validationRunSummary.length > 0; else NoDataFound" class="box-body"> -->
+                            <div  class="box-body">
+                            <table  class="table table-bordered">
+                            <tr style="background-color:#f9f9f9" >
+                                <th>Searched Parameters</th>
+                                <th>Total Number Of Records</th>
+                                <th>Total Number Of Rejected Records</th>
+                                <th>Waiting for Analysis</th>
+                                <th>Run Date</th>
+                                <th>Run By</th>
+                                <th>Action</th>
+                            </tr>
+                            <tr>
+                                <td>{{validationRunSummary[0].ValidateParameter}}</td>
+                                <td>{{validationRunSummary[0].TotalNumberOfRecords}}</td>
+                                <td>{{validationRunSummary[0].TotalNumberOfRejectedRecords}}</td>
+                                <td>{{validationRunSummary[0].TotalNumberOfFoundRecords}}</td>
+                                <td>{{validationRunSummary[0].Run_DateTime | date: 'MM-dd-yyyy' }}</td>
+                                <td>{{validationRunSummary[0].Run_InitiatedBy}}</td>
+                                <td> <button type="button" class="btn btn-default" (click)="ValidateExportOptionSelectModal(validationRunSummary[0],ValidateExportModal)"  >Export</button></td>
+                            </tr>
+                            </table>
+                        </div>
+                        </mk-box>
+                    </div>
+                    </div>
+                      
+                           
+                    <!-- <div *ngIf="rmsExportDetails.length > 0" > -->
+                    <div  >
+                        <div class="row">
+                            <div class="col-md-12">
+                                <mk-box header="Step2 - Analyze Run Summary"  boxColor="primary" [isCollapsable]="false" [isRemovable]="false" [isRemovable]="false" [isSolid]="true" >
+                                <!--  <div *ngIf="rmsExportDetails.length > 0; else NoDataFound" class="box-body"> -->
+                                    <div class="box-body">  
+                                    
+                                        <table  class="table table-bordered" style="word-wrap:break-word;table-layout:fixed;" >
+                                        <tr style="background-color:#f9f9f9" >
+                                            <th>Searched Parameters</th>
+                                            <th>Total Analyzed Records</th>
+                                            <th>Matched Records</th>
+                                            <th>Not Matched Records</th>
+                                            <th>Run Date</th>
+                                            <th>Run By</th>
+                                            <th>Default</th>
+                                            <th>Action</th>
+                                        </tr>
+                                        <tr *ngFor="let item of rmsExportDetails" >
+                                            <!-- <td *ngFor="let i of item.Search_Parameters; let isLast=last">
+                                            {{i}}{{isLast ? '' : ', '}}
+                                            </td> -->
+                                            <td>{{item.parameterdetails}}</td> 
+                                            <td>{{validationRunSummary[0].TotalNumberOfFoundRecords}}</td>
+                                            <td>{{item.TotalNumberOfFoundRecords}}</td>
+                                            <td>{{item.TotalNumberOfNOTFoundRecords}}</td>
+                                            <td>{{item.Run_DateTime | date: 'MM-dd-yyyy' }}</td>
+                                            <td>{{item.Run_InitiatedBy }}</td>
+                                            <!-- <td> <input type="radio" (click)="DefaultConfirmModal(item,template)" [checked]="IsDefault(item)"  name="DefaultRmsRun" ></td> -->
+                                            <td>
+                                                <div *ngIf="IsDefault(item); then YESTEXT else NOTEXT"></div>
+                                                <ng-template #YESTEXT>
+                                                <p>YES</p>
+                                                </ng-template>
+                                                <ng-template #NOTEXT>
+                                                <p>NO</p>
+                                                </ng-template>
+                                            </td>
+                                            <td> <button type="button" class="btn btn-default" (click)="RMSExportOptionSelectModal(item,RMSExportModal)"  >Export</button></td>
+                                        </tr>
+                                        </table> 
+                                    
+                                    
+                                </div>
+                            </mk-box>   
+                            </div>
+                        </div>    
+                        </div>
+                              
+                    <ng-template #NoValidData>
+                        <h4>Please complete step1</h4>
+                    </ng-template>
+                    
+                    <ng-template #NoDataFound>
+                        <h4>No data found...</h4>
+                    </ng-template>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-danger" (click)="CloseModal()" >Cancel</button>
+                    </div>
+            </div>
+            
+        </div>
+      
+</ng-template>
+
+<ng-template #template>
+    <div class="modal-body text-center">
+        <p>Do you want to confirm?</p>
+        
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-success" (click)="MakeDefault()" >Yes</button>
+        <button type="button" class="btn btn-error" (click)="CloseModal()" >No</button>
+    </div>
+</ng-template>

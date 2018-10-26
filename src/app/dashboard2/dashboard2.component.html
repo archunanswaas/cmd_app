@@ -1,0 +1,192 @@
+<mk-box boxColor="info" header="Select below options to filter" [isCollapsable]="false" [isRemovable]="false">
+     
+  <div class="row">
+
+        <div class="col-md-3 col-sm-6 col-xs-12">
+
+            <form [formGroup]="filterForm" (ngSubmit)="onSubmit()"> 
+              
+                <mk-box header="Individual" boxColor="success" [isRemovable]="false" [isSolid]="true">
+                    <ul class="nav nav-pills nav-stacked">
+                         
+                        <li>
+                            <input type="text" formControlName="first_name" placeholder="First name"  name="first_name"   class="form-control" id="first_name"> 
+                        </li>
+                        <li>
+                            <input type="text" formControlName="last_name" placeholder="Last name"  name="last_name"   class="form-control" id="last_name"> 
+                        </li>
+                        <li> 
+                            <input type="text" formControlName="npi" placeholder="NPI" name="npi"   class="form-control" id="npi" > 
+                        </li> 
+                        <li> 
+                            <input type="text" formControlName="hcp_email" placeholder="Email" name="hcp_email"   class="form-control" id="hcp_email" > 
+                        </li>
+                      </ul>
+                </mk-box>
+                <mk-box header="Ownership" boxColor="primary" [isRemovable]="false" [isSolid]="true" [isCollapsed]="false" >
+                    <ul class="nav nav-pills nav-stacked">
+                        <li>
+                            <ejs-multiselect formControlName="ownership_id" name="ownership_id" [dataSource]='ownership' [fields]='fields' id="ownership_id" placeholder='Select Ownership' >
+                            </ejs-multiselect>
+                        </li>
+                    </ul>
+                </mk-box>
+                <mk-box header="Campaign" boxColor="warning" [isRemovable]="false" [isSolid]="true" [isCollapsed]="false" >
+                    <ul class="nav nav-pills nav-stacked">
+                      <!-- <li>
+                        <select formControlName="account_id" name="account_id" [(ngModel)]="selectedAccount" (change)="onSelectAccount($event.target.value)" class="form-control" id="account_id"> 
+                        <option value="0">Select Account</option>
+                        <option *ngFor="let acc of accounts" value= {{acc.id}}>{{acc.name}}</option>
+                        </select>
+                      </li> -->
+                       <li>
+                           <!--  <select multiple formControlName="campaign_id" name="campaign_id" [(ngModel)]="selectedCampaign" (change)="onSelectCampaign($event.target.value)" class="form-control" id="campaign"  >
+                              <option value="0">Select Campaign</option>
+                                <option *ngFor="let campaign of campaigns" value= {{campaign.id}}>{{campaign.name}}</option>
+                            </select> -->
+
+                            <ejs-multiselect #campaign id = "campaign" formControlName="campaign_id" name="campaign_id" [dataSource]='campaigns' [fields]='fields' (change)="onSelectCampaign($event)"  placeholder='Select Campaigns' >
+                            </ejs-multiselect>
+                      
+                        </li>
+
+                     <!--<div  *ngIf="campaigns.length === 0">
+                        <li><span>No data found...</span>
+                        </li></div>-->
+                      <!--<li> 
+                        <select formControlName="top_hcp" name="top_hcp" [(ngModel)]="selectedtopof" class="form-control" id="top_hcp">
+                          <option value="0">Select option</option>
+                          <option value="1">Exposure</option>
+                          <option value="2">Engagement</option>
+                          <option value="3">Interaction</option>
+                        </select>
+                      </li> -->
+                    </ul>
+                  </mk-box>
+                  <mk-box header="Specialty"  boxColor="primary" [isLoading]="spl_spinner_loader" [isCollapsed]="false" [isRemovable]="false" [isSolid]="true">
+                        <ul class="nav nav-pills nav-stacked">
+                            <li>
+                                <label>Specialty <span  *ngIf="specialties.length > 0 ">({{specialties.length}})</span> </label>
+                                <!-- <select *ngIf="specialties.length > 0" multiple formControlName="tp_specialty_id" name="tp_specialty_id"  class="form-control" id="tp_specialty_id">
+                                  <option value="0">Select Specialty</option> 
+                                  <option *ngFor="let sp of specialties" value= {{sp.id}}>{{sp.name}}</option>
+                                </select> -->
+                                <ejs-multiselect formControlName="tp_specialty_id" name="tp_specialty_id" [dataSource]='specialties' [fields]='fields' placeholder='Select Specialties' >
+                                </ejs-multiselect>
+                            <li>
+                        </ul>
+                        <!-- <div  *ngIf="specialties.length === 0 ">No data found...</div -->
+                    </mk-box> 
+                <mk-box header="Location" boxColor="primary" [isLoading]="loc_spinner_loader" [isCollapsed]="false" [isRemovable]="false" [isSolid]="true" >
+                    <ul class="nav nav-pills nav-stacked">
+                        <li>
+                            <label>State  <span  *ngIf="states.length > 0 ">( {{states.length}} )</span> </label>
+                            <!-- <select *ngIf="states.length > 0" multiple formControlName="tp_state_id" name="tp_state_id"  class="form-control" id="tp_state_id">
+                                <option value="0">Select Location</option> 
+                              <option *ngFor="let state of states" value= {{state.id}}>{{state.name}}</option>
+                            </select> -->
+                            <ejs-multiselect formControlName="tp_state_id" name="tp_state_id" [dataSource]='states' [fields]='fields' placeholder='Select States'  >
+                              </ejs-multiselect>
+                            <!-- <div  *ngIf="states.length === 0 ">No data found...</div> -->
+                        </li>
+                    </ul>
+                </mk-box> 
+                
+                <mk-box header="Network type " boxColor="primary" [isRemovable]="false" [isCollapsed]="true" [isSolid]="true">
+                  <ul class="nav nav-pills nav-stacked">
+                      <li><label>Network type</label>
+                          <select formControlName="network_type" name="network_type"  class="form-control" id="network_type">
+                              <!-- <option value="0">Select Specialty</option> -->
+                              <option value= "" >ALL</option>
+                              <option value= 1 >IN</option>
+                              <option value= 0 >OUT</option>
+                          </select>
+                          <div  *ngIf="specialties.length === 0 ">No data found...</div>
+                      </li>
+                    </ul>
+              </mk-box>
+
+             
+
+             <div class="pull-right">
+              <!-- <button type="button" (click)="formReset()" class="btn btn-warning">Reset</button> -->
+              <button type="submit" class="btn btn-success">Submit</button>
+            </div>
+                
+          </form>
+        </div>
+
+
+      
+
+         
+
+      <div class="col-md-9 col-sm-6 col-xs-12">
+        
+          <ejs-grid  [dataSource]='hcplist' [editSettings]="editSettings" [allowPaging]="true"  [allowReordering]="true"  [allowSorting]="true" [allowFiltering]="true" [allowGrouping]="true" [pageSettings]='pageSettings'>
+              
+            <e-columns>
+                 
+                  <e-column  headerText='More' [visible]="showmore" width=140 [commands]='commands' id="targetButton" ></e-column>
+                  <e-column field='hcp_global_id' headerText='CMD ID' textAlign='Left' width="200" ></e-column>
+                  <e-column field='owner_name' headerText='OWNER' textAlign='Left' width="200" ></e-column>
+                  <e-column field='npi' headerText='NPI' textAlign='Left' width="200" ></e-column>
+                  <e-column field='campaign_name' headerText='CAMPAIGN' textAlign='Left' width="200" ></e-column>
+                  <e-column field='first_name' headerText='FIRST NAME' textAlign='Left' width="200" ></e-column>
+                  <e-column field='last_name' headerText='LAST NAME' textAlign='Left' width="200" ></e-column>
+                  <e-column field='email' headerText='EMAIL ID' textAlign='Left' width="300" ></e-column>
+                  <e-column field='specialty' headerText='SPECIALTY' textAlign='Left' width="200" ></e-column>
+                  <e-column field='state' headerText='CITY' textAlign='Left' width="200" ></e-column>
+                  <e-column field='state' headerText='STATE' textAlign='Left' width="200" ></e-column>
+                  <e-column field='zipcode' headerText='ZIPCODE' textAlign='Left' width="200" ></e-column>
+                  <e-column field='total_email_sent' headerText='SENT' textAlign='Left' width="100" ></e-column>
+                  <e-column field='total_email_click' headerText='CLICK' textAlign='Left' width="100" ></e-column>
+                  <e-column field='total_email_open' headerText='OPEN' textAlign='Left' width="100" ></e-column>
+                  <e-column field='total_email_engage' headerText='ENGAGE' textAlign='Left' width="110" ></e-column>
+                  <e-column field='network_type' headerText='NETWORK TYPE' textAlign='Left' width="250" ></e-column>
+                  <e-column field='start_date' headerText='LICENSE START DATE'  textAlign='Left' width="250" ></e-column>
+                  <e-column field='end_date' headerText='LICENSE END DATE' textAlign='Left' width="250" ></e-column>
+          
+              </e-columns>
+              </ejs-grid>
+            
+      </div>
+
+    </div>
+
+</mk-box>
+
+
+<div #container class='root-container' >
+  <ejs-dialog id='dialog' isModal='true' [visible]='visible' #ejDialog header='Matching HCP List' (overlayClick)="onOverlayClick()" showCloseIcon='true' [target]='targetElement' height="500px" width='1000px'  [buttons]='buttons'>
+
+  <ejs-grid [dataSource]='morehcplist'  [editSettings]="editSettings" [allowPaging]="true"  [allowReordering]="true"  [allowSorting]="true" [allowFiltering]="true" [allowGrouping]="true" [pageSettings]='pageSettings'>
+              
+      <e-columns>
+            <e-column field='hcp_global_id' headerText='CMD ID' textAlign='Left' width="200" ></e-column>
+            <e-column field='owner_name' headerText='OWNER' textAlign='Left' width="200" ></e-column>
+            <e-column field='npi' headerText='NPI' textAlign='Left' width="200" ></e-column>
+            <e-column field='campaign_name' headerText='CAMPAIGN' textAlign='Left' width="200" ></e-column>
+            <e-column field='first_name' headerText='FIRST NAME' textAlign='Left' width="200" ></e-column>
+            <e-column field='last_name' headerText='LAST NAME' textAlign='Left' width="200" ></e-column>
+            <e-column field='email' headerText='EMAIL ID' textAlign='Left' width="300" ></e-column>
+            <e-column field='specialty' headerText='SPECIALTY' textAlign='Left' width="200" ></e-column>
+            <e-column field='state' headerText='CITY' textAlign='Left' width="200" ></e-column>
+            <e-column field='state' headerText='STATE' textAlign='Left' width="200" ></e-column>
+            <e-column field='zipcode' headerText='ZIPCODE' textAlign='Left' width="200" ></e-column>
+            <e-column field='total_email_sent' headerText='SENT' textAlign='Left' width="100" ></e-column>
+            <e-column field='total_email_click' headerText='CLICK' textAlign='Left' width="100" ></e-column>
+            <e-column field='total_email_open' headerText='OPEN' textAlign='Left' width="100" ></e-column>
+            <e-column field='total_email_engage' headerText='ENGAGE' textAlign='Left' width="110" ></e-column>
+            <e-column field='network_type' headerText='NETWORK TYPE' textAlign='Left' width="250" ></e-column>
+            <e-column field='start_date' headerText='LICENSE START DATE'  textAlign='Left' width="250" ></e-column>
+            <e-column field='end_date' headerText='LICENSE END DATE' textAlign='Left' width="250" ></e-column>
+      </e-columns>
+
+        </ejs-grid>
+</ejs-dialog>
+</div>
+  
+  
+  
+  

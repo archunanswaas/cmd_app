@@ -1,0 +1,114 @@
+<mk-box boxColor="info" header="Select below options to filter" [isCollapsable]="false" [isRemovable]="false">
+  <div class="row">
+    <form [formGroup]="filterForm" (ngSubmit)="onSubmit()">
+    <div class="col-md-4 col-sm-6 col-xs-12">
+    <div class="form-group">
+      <label>Accounts</label>
+      <select formControlName="account_id" name="account_id" [(ngModel)]="selectedAccount" (change)="onSelectAccount($event.target.value)" class="form-control" id="account"
+      >
+      <option value="0">Select Account</option>
+     <option *ngFor="let acc of accounts" value= {{acc.id}}>{{acc.name}}</option>
+   </select>
+    </div>
+    </div>
+    <div class="col-md-4 col-sm-6 col-xs-12">
+    <div class="form-group">
+      <label>Campaigns</label>
+      <select formControlName="campaign_id" name="campaign_id" [(ngModel)]="selectedCampaign" class="form-control" id="campaign">
+          <option value="0">Select Campaign</option>
+        <option *ngFor="let campaign of campaigns" value= {{campaign.id}}>{{campaign.name}}</option>
+      </select>
+    </div>
+    </div>
+    
+    <div class="col-md-4 col-sm-6 col-xs-12" style="margin-top: 25px;">
+    <button type="submit" class="btn btn-success">Submit</button>
+    </div>
+    </form>
+  </div>
+</mk-box>
+
+
+<div class="row">
+  <div class="col-md-3 col-sm-6 col-xs-12">
+    <div class="small-box bg-aqua" >
+        <div class="inner">
+          <h1>Target HCP count</h1> 
+         
+          <p *ngIf="totalhcp"> <i class="fa fa-user-md" aria-hidden="true"></i> {{totalhcp.tot_hcp | number }}</p>
+          <!-- <p *ngIf="totalhcp.tot_hcp == null || totalhcp.tot_hcp == 0 " > <i class="fa fa-user-md" aria-hidden="true"></i> {{0}} </p> -->
+        </div>
+        
+        <a href="#" class="small-box-footer">
+          More info <i class="fa fa-arrow-circle-right"></i>
+        </a>
+      </div>
+  </div><!-- /.col -->
+  <div class="col-md-3 col-sm-6 col-xs-12">
+    <div class="small-box bg-green">
+        <div class="inner">
+          <h1>Total Exposure</h1>
+          <div class="row" >
+              <div class="col-md-6">
+                  <span >
+                     <!-- <span>Sent</span> --> 
+                     <!-- <p *ngIf="totalemailsent.tot_sent > 0" ><i class="fa fa-paper-plane" aria-hidden="true"></i> {{totalemailsent.tot_sent | number }}</p>
+                     <p *ngIf="totalemailsent.tot_sent == null || totalemailsent.tot_sent == 0 " > <i class="fa fa-paper-plane" aria-hidden="true"></i> {{0}} </p> -->
+                     <p *ngIf="totalemailsent" ><i class="fa fa-paper-plane" aria-hidden="true"></i> {{totalemailsent.tot_sent | number }}</p>
+                     
+                  </span>              
+              </div>
+              <div class="col-md-6">
+                  <span >
+                   <!--  <span>Opens:</span>  -->
+                  <!--   <p *ngIf="totalemailopen.tot_open > 0" > <i class="fa fa-envelope-open" aria-hidden="true"></i> {{totalemailopen.tot_open | number }}</p>
+                    <p *ngIf="totalemailopen.tot_open == null || totalemailopen.tot_open == 0 " > <i class="fa fa-envelope-open" aria-hidden="true"></i> {{0}} </p> -->
+                    <p *ngIf="totalemailopen" > <i class="fa fa-envelope-open" aria-hidden="true"></i> {{totalemailopen.tot_open | number }}</p>
+                  </span>
+              </div>
+          </div>
+        
+        </div>
+       <a href="#" class="small-box-footer">
+          More info <i class="fa fa-arrow-circle-right"></i>
+        </a>
+      </div> 
+  </div><!-- /.col -->
+  <div class="col-md-3 col-sm-6 col-xs-12">
+   
+    <div class="small-box bg-yellow">
+        <div class="inner"> 
+          <h1>Total Engagement</h1>
+          
+       <!--    <p *ngIf="totalemailclick.tot_engage > 0" > <i class="fa fa-low-vision" aria-hidden="true"></i>  {{totalemailclick.tot_engage | number }}</p>
+          <p *ngIf="totalemailclick.tot_engage == null || totalemailclick.tot_engage == 0" > <i class="fa fa-low-vision" aria-hidden="true"></i> {{0}} </p> -->
+          <p *ngIf="totalemailclick" > <i class="fa fa-low-vision" aria-hidden="true"></i>  {{totalemailclick.tot_engage | number }}</p>
+          
+        </div>
+       <a href="#" class="small-box-footer">
+          More info <i class="fa fa-arrow-circle-right"></i>
+        </a>
+      </div>
+    
+  </div><!-- /.col -->
+  <div class="col-md-3 col-sm-6 col-xs-12">
+    <div class="small-box bg-red">
+        <div class="inner">
+          <h1>Total Interaction</h1>
+         <!--  <p *ngIf="totalassetclick.tot_inter > 0" > <i class="fa fa-eye" aria-hidden="true"></i>  {{ totalassetclick.tot_inter | number }}</p>
+          <p *ngIf="totalassetclick.tot_inter == null || totalassetclick.tot_inter == 0" > <i class="fa fa-eye" aria-hidden="true"></i> {{0}} </p> -->
+          <p *ngIf="totalassetclick" > <i class="fa fa-eye" aria-hidden="true"></i>  {{ totalassetclick.tot_inter | number }}</p>
+        
+        </div>
+       <a href="#" class="small-box-footer">
+          More info <i class="fa fa-arrow-circle-right"></i>
+        </a>
+      </div>
+  </div><!-- /.col -->
+</div>
+
+
+
+
+
+

@@ -1,0 +1,518 @@
+<div class="row">
+  <div class="col-md-10 col-xs-12">
+
+   
+     
+    <tabset #staticTabs [justified]="true" >
+
+      <tab heading="Step1 - Validate"  > 
+       
+              
+            <div class="container">
+                
+              <div *ngIf="showValidationInfo == 0" >
+
+                <div class="row">
+                  <div class="col-md-10 col-md-offset-7" style="padding-bottom: 45px;padding-top: 35px;padding-left: 78px;">
+                             
+                           <a href="assets/RMS_BulkUploadNew.xlsx" style="padding-left: 44px;"> <button type="button" class="btn btn-primary">Download Template</button></a>
+                        
+                   </div>
+                </div>
+
+          
+            <!------------------------------------- Upload form START------------------------------------------------------->  
+            
+           <form [formGroup]="uploadForm"  class="form-horizontal"  (ngSubmit)="fileupload()" encypt="multipart/form-data" >
+              <div class="form-group">
+                <label class="control-label col-sm-4" for="platform_id">Select Platform</label>
+                <div class="col-sm-6">
+                 <ejs-dropdownlist #platform formControlName="platform_id" [allowFiltering]='true' (change)="onSelectPlatform()"  name="platform_id" id="platform"  [dataSource]='Platforms' [fields]="fields"  placeholder="Select Platform"  ></ejs-dropdownlist>
+                
+                </div>
+              </div>
+
+              <div class="form-group">
+                  <label class="control-label col-sm-4" for="campaign_id">Select Campaign</label>
+                  <div class="col-sm-6">          
+                      <ejs-dropdownlist #campaign_id formControlName="campaign_id" [allowFiltering]='true' (change)="onSelectCampaign()"  name="campaign_id" id="campaign_id"  [dataSource]='Campaigns' [fields]="fields" placeholder="Select Campaign" ></ejs-dropdownlist>
+                  </div>
+                </div>
+
+              <div class="form-group">
+                  <label class="control-label col-sm-4" for="acc_id">Select Account </label>
+                  <div class="col-sm-6">
+                   <ejs-dropdownlist #acc_id formControlName="acc_id" [allowFiltering]='true'  name="acc_id" id="acc_id"  [dataSource]='Accounts' [fields]="fields" placeholder="Select Accounts" ></ejs-dropdownlist>
+                  </div>
+                </div>
+              
+              <div class="form-group required">
+                  <label class="control-label col-sm-4" for="uploadfiles" >Upload File</label> 
+                  <div class="col-sm-4">          
+                    <input formControlName="uploadfiles" [attr.disabled]="is_disabled?'':null" type="file" name="uploadfiles"  id="uploadfiles" >
+                    <div *ngIf="submitted && f.uploadfiles.errors" class="invalid-feedback">
+                        <div *ngIf="f.uploadfiles.errors.required" style="color: red;" >This field is required</div>
+                    </div>
+                  </div>
+
+                  <div class="col-sm-2" >          
+                     <button type="submit" class="btn btn-warning" style="width: 199px;" >Upload & Validate File</button>
+                  </div>
+                   
+                </div>
+
+                </form>
+                <!------------------------------------- Upload form END--------------------------------------------------->
+
+                <!------------------------------------- Validation form START--------------------------------------------->
+                <form [formGroup]="validateForm" class="form-horizontal"  (ngSubmit)="onSubmit()"  >
+
+                <div *ngIf="uploadedFileDetails">
+                  <div class="form-group">
+                    <label class="control-label col-sm-4" for="file_headers">Validation Fields</label>
+                      <div class="col-sm-4">          
+                        
+                        <ejs-multiselect #file_headers formControlName="file_headers" name="file_headers" [dataSource]='MandatoryFields' [fields]='fields' id="file_headers" placeholder='Select Fields' >
+                          </ejs-multiselect>
+                          (Note: Email Address is default and considered for mandatory check)
+                      </div>
+                      <div class="col-sm-2">
+                        <button type="submit" class="btn btn-warning" style="width: 199px;" >Validate Data</button>
+                      </div>
+                  </div>
+                </div>
+              </form>
+              <!------------------------------------- Validation form END --------------------------------------------->
+              
+            </div>
+
+              <div *ngIf="showValidationInfo == 1" >
+                <div class="row">
+                  <div class="col-md-12">
+                    <mk-box header="Run Info"  boxColor="success" [isCollapsable]="false" [isRemovable]="false" [isRemovable]="false" [isSolid]="true" >
+                      <div *ngIf="validationRunInfo.length > 0; else NoDataFound" class="box-body">
+                        <table  class="table table-bordered">
+                          <tr style="background-color:#f9f9f9" >
+                            <th>Platform Name</th>
+                            <th>Campaign Name</th>
+                            <th>Account Name</th>
+                            <th>Uploaded File Name</th>
+                            <th>Run Date</th>
+                            <th>Run By</th>
+                          </tr>
+                          <tr>
+                              <td>
+                                  <div *ngIf="is_empty(validationRunInfo[0].platfrom_name); then Hiphen else platfrom_name"></div>
+                                  <ng-template #platfrom_name>
+                                      <p>{{validationRunInfo[0].platfrom_name}}</p>
+                                  </ng-template>
+                              </td>
+                              <td>
+                                  <div *ngIf="is_empty(validationRunInfo[0].campaign_name); then Hiphen else account_name"></div>
+                                  <ng-template #account_name>
+                                      <p>{{validationRunInfo[0].campaign_name}}</p>
+                                  </ng-template>
+                              </td>
+                              <td>
+                                  <div *ngIf="is_empty(validationRunInfo[0].account_name); then Hiphen else campaign_name"></div>
+                                  <ng-template #campaign_name>
+                                      <p>{{validationRunInfo[0].account_name}}</p>
+                                  </ng-template>
+                              </td>
+                            <td>{{validationRunInfo[0].File_Name}}</td>
+                            <td>{{validationRunInfo[0].Upload_Datetime | date: 'MM-dd-yyyy' }}</td>
+                            <td>{{validationRunInfo[0].uploaded_by}}</td>
+                          </tr>
+                        </table>
+                      </div>
+                    </mk-box>
+                  </div>
+                </div>
+              </div>  
+
+
+            <div *ngIf="validationRunSummary.length > 0" >
+              <div class="row">
+                <div class="col-md-12">
+                  <mk-box header="Validation Run Summary"  boxColor="primary" [isCollapsable]="false" [isRemovable]="false" [isRemovable]="false" [isSolid]="true" >
+                    <div *ngIf="validationRunSummary.length > 0; else NoDataFound" class="box-body">
+                      <table  class="table table-bordered">
+                        <tr style="background-color:#f9f9f9" >
+                          <th>Searched Parameters</th>
+                          <th>Total Number Of Records</th>
+                          <th>Total Number of Rejected Records</th>
+                          <th>Waiting for Analysis</th>
+                          <th>Run Date</th>
+                          <th>Run By</th>
+                          <th>Action</th>
+                        </tr>
+                        <tr>
+                          <td>{{validationRunSummary[0].ValidateParameter}}</td>
+                          <td>{{validationRunSummary[0].TotalNumberOfRecords}}</td>
+                          <td>{{validationRunSummary[0].TotalNumberOfRejectedRecords}}</td>
+                          <td>{{validationRunSummary[0].TotalNumberOfFoundRecords}}</td>
+                          <td>{{validationRunSummary[0].Run_DateTime | date: 'MM-dd-yyyy' }}</td>
+                          <td>{{validationRunSummary[0].Run_InitiatedBy}}</td>
+                          <td> <button type="button" class="btn btn-default" (click)="ValidateExportOptionSelectModal(validationRunSummary[0],ValidateExportModal)"  >Export</button></td>
+                        </tr>
+                      </table>
+                    </div>
+                  </mk-box>
+                </div>
+              </div>
+              <div *ngIf="validationRunSummary[0].TotalNumberOfFoundRecords > 0" >        
+                <div class="box-footer">
+                  <button type="button" (click)="analyzeTab(1)" class="btn btn-warning pull-right">Proceed to Next step</button>
+                </div>
+              </div>
+            </div>
+
+
+         
+          </div>
+       
+      </tab>
+      <!-- <mk-tab header="Step2 - Analyze" [isDisabled]="is_analyzeTab_active()" > -->
+      <tab heading="Step2 - Analyze"  >
+        <div class="container">
+          <div *ngIf="!is_analyzeTab_active(); else NoValidData">
+              <div class="row">
+                  <div class="col-md-12">
+                    <mk-box header="Run Info"  boxColor="success" [isCollapsable]="true" [isCollapsed]="true" [isRemovable]="false" [isRemovable]="false" [isSolid]="true" >
+                      <div *ngIf="validationRunInfo.length > 0; else NoDataFound" class="box-body">
+                        <table  class="table table-bordered">
+                          <tr style="background-color:#f9f9f9" >
+                            <th>Platform Name</th>
+                            <th>Campaign Name</th>
+                            <th>Account Name</th>
+                            <th>Uploaded File Name</th>
+                            <th>Run Date</th>
+                            <th>Run By</th>
+                          </tr>
+                          <tr>
+                              <td>
+                                  <div *ngIf="is_empty(validationRunInfo[0].platfrom_name); then Hiphen else platfrom_name"></div>
+                                  <ng-template #platfrom_name>
+                                      <p>{{validationRunInfo[0].platfrom_name}}</p>
+                                  </ng-template>
+                              </td>
+                              <td>
+                                  <div *ngIf="is_empty(validationRunInfo[0].campaign_name); then Hiphen else account_name"></div>
+                                  <ng-template #account_name>
+                                      <p>{{validationRunInfo[0].campaign_name}}</p>
+                                  </ng-template>
+                              </td>
+                              <td>
+                                  <div *ngIf="is_empty(validationRunInfo[0].account_name); then Hiphen else campaign_name"></div>
+                                  <ng-template #campaign_name>
+                                      <p>{{validationRunInfo[0].account_name}}</p>
+                                  </ng-template>
+                              </td>
+                            <td>{{validationRunInfo[0].File_Name}}</td>
+                            <td>{{validationRunInfo[0].Upload_Datetime | date: 'MM-dd-yyyy' }}</td>
+                            <td>{{validationRunInfo[0].uploaded_by}}</td>
+                          </tr>
+                        </table>
+                      </div>
+                    </mk-box>
+                  </div>
+                </div>
+            <div class="row">
+              <div class="col-md-12">
+                <mk-box header="Step1 - Validation Run Summary"  boxColor="primary" [isCollapsable]="true" [isCollapsed]="false" [isRemovable]="false" [isRemovable]="false" [isSolid]="true" >
+                  <div *ngIf="validationRunSummary.length > 0; else NoDataFound" class="box-body">
+                    <table  class="table table-bordered">
+                      <tr style="background-color:#f9f9f9" >
+                        <th>Searched Parameters</th>
+                        <th>Total Number Of Records</th>
+                        <th>Total Number of Rejected Records</th>
+                        <th>Waiting for Analysis</th>
+                        <th>Run Date</th>
+                        <th>Run By</th>
+                        <th>Action</th>
+                      </tr>
+                      <tr>
+                        <td>{{validationRunSummary[0].ValidateParameter}}</td>
+                        <td>{{validationRunSummary[0].TotalNumberOfRecords}}</td>
+                        <td>{{validationRunSummary[0].TotalNumberOfRejectedRecords}}</td>
+                        <td>{{validationRunSummary[0].TotalNumberOfFoundRecords}}</td>
+                        <td>{{validationRunSummary[0].Run_DateTime | date: 'MM-dd-yyyy' }}</td>
+                        <td>{{validationRunSummary[0].Run_InitiatedBy}}</td>
+                        
+                        <td> <button type="button" class="btn btn-default" (click)="ValidateExportOptionSelectModal(validationRunSummary[0],ValidateExportModal)"  >Export</button></td>
+                      </tr>
+                    </table>
+                  </div>
+                </mk-box>
+              </div>
+            </div>
+          <hr>
+         
+          <div class="container">
+            <div *ngIf="is_completed == 1">
+              <form [formGroup]="rmsRunForm" class="form-horizontal"  (ngSubmit)="onSubmitRmsRun()"  >
+                 
+                <div class="form-group required">
+                    <label class="col-sm-1" for=""></label> 
+                    <div class="col-sm-4">
+                        <label class="control-label" >Select Application Fields</label>     
+                    </div>
+                    <div class="col-sm-4">
+                        <label class="control-label" >Select Uploaded File Fields</label>     
+                    </div>
+                </div> 
+           
+                <div formArrayName="field_comparisons" *ngFor="let item of field_comparisons.controls; let i = index;" >
+                    <div [formGroupName]="i" > 
+                   <div class="form-group">
+                    <label class="control-label col-sm-1" for=""></label> 
+                    
+                    <div class="col-sm-4">
+                      <!-- <ejs-multiselect formControlName="primary_fields" name="primary_fields" id='primary_fields' [dataSource]='PrimaryFieldsData' [fields]='PrimaryFields' placeholder ='Select System Fields'></ejs-multiselect> -->
+                      <ejs-dropdownlist #primary_fields  formControlName="SystemField" [allowFiltering]='true'  name="SystemField" id="primary_fields"  [dataSource]='PrimaryFieldsData' [fields]="PrimaryFields" placeholder="Select Application Fields" ></ejs-dropdownlist>
+                       <div *ngIf="Rmssubmitted && field_comparisons__[i].controls.SystemField.errors" class="invalid-feedback">
+                          <div *ngIf="field_comparisons__[i].controls.SystemField.errors.required" style="color: red;" >This field is required</div>
+                      </div>
+                      <div *ngIf="IsPrimaryNotSelected" style="color: red;" >
+                          Please select atleast one primary field
+                        </div>      
+                    </div>
+                    
+                    <div class="col-sm-4">
+                      <!-- <ejs-multiselect formControlName="excel_fields" name="excel_fields" id='excel_fields' [dataSource]='ExcelFieldsData' [fields]='PrimaryFields' placeholder ='Select Excel Fields'></ejs-multiselect> -->
+                      <ejs-dropdownlist #excel_fields formControlName="FileField" [allowFiltering]='true'  name="FileField" id="excel_fields"  [dataSource]='ExcelFieldsData' [fields]="PrimaryFields" placeholder="Select Uploaded File Fields" ></ejs-dropdownlist>
+                      <div *ngIf="Rmssubmitted && field_comparisons__[i].controls.FileField.errors" class="invalid-feedback">
+                          <div *ngIf="field_comparisons__[i].controls.FileField.errors.required" style="color: red;" >This field is required</div>
+                      </div> 
+                      
+                    </div>
+
+                    <div class="col-sm-2"> 
+                      <i class="fa fa-minus-circle" (click)="deleteRow(i)" aria-hidden="true" style="font-size: 24px;color:red;cursor: pointer;"></i>
+                     
+                    </div>
+                  </div>
+                  </div>
+                </div>
+                
+                <div class="form-group">
+
+                    <label class="control-label col-sm-1" ></label>
+                    <div class="col-sm-3"> 
+                        <button type="button" (click)="addRow()" class="btn btn-info">Add new parameter</button>
+                    </div>
+
+                    <div class="col-sm-5" style="text-align: right;"> 
+                      <label class="checkbox-inline">
+                            <input type="checkbox" formControlName="OutNetwork" value="1" >Include out network records
+                      </label>
+                    </div>
+                    
+                  </div>
+                <!-- <div class="form-group">
+                  <label class="control-label col-sm-2" for="secondary_fields">Secondary Fields :</label> 
+                     <div class="col-md-4">     
+                        <ejs-multiselect formControlName="secondary_fields" name="secondary_fields" [dataSource]='SecondaryFieldsData' [fields]='SecondaryFields' id="secondary_fields" placeholder='Select Secondary Fields' >
+                        </ejs-multiselect>
+                      </div> 
+                      <div class="col-md-4">
+                          <button type="submit" class="btn btn-success"  >Analyze</button>
+                      </div> 
+                </div> -->
+                <div class="form-group">        
+                    <div class="col-sm-offset-8 col-sm-10">
+                      <button type="submit" class="btn btn-success" >Analyze</button>
+                    </div>
+                </div>
+            </form>
+          </div>
+        </div>
+        <div *ngIf="rmsExportDetails.length > 0" >
+            <div class="row">
+                <div class="col-md-12">
+                    <mk-box header="Step2 - Analyze Run Summary"  boxColor="primary" [isCollapsable]="false" [isRemovable]="false" [isRemovable]="false" [isSolid]="true" >
+                      <div *ngIf="rmsExportDetails.length > 0; else NoDataFound" class="box-body">
+                       
+                          
+                            <table  class="table table-bordered" style="word-wrap:break-word;table-layout:fixed;" >
+                              <tr style="background-color:#f9f9f9" >
+                                <th>Searched Parameters</th>
+                                <th>Total Analyzed Records</th>
+                                <th>Matched Records</th>
+                                <th>Not Matched Records</th>
+                                <th>Run Date</th>
+                                <th>Run By</th>
+                                <th>Default</th>
+                                <th>Action</th>
+                              </tr> 
+                              <tr *ngFor="let item of rmsExportDetails" >
+                                <!-- <td *ngFor="let i of item.Search_Parameters; let isLast=last">
+                                  {{i}}{{isLast ? '' : ', '}}
+                                </td> -->
+                                <td>{{item.parameterdetails}}</td> 
+                                <td>{{validationRunSummary[0].TotalNumberOfFoundRecords}}</td>
+                                <td>{{item.TotalNumberOfFoundRecords}}</td>
+                                <td>{{item.TotalNumberOfNOTFoundRecords}}</td>
+                                <td>{{item.Run_DateTime | date: 'MM-dd-yyyy' }}</td>
+                                <td>{{item.Run_InitiatedBy }}</td>
+                                <td> <input type="radio" (click)="DefaultConfirmModal($event,item,template)" [checked]="IsDefault(item)"  name="DefaultRmsRun" ></td>
+                                <td> <button type="button" class="btn btn-default" (click)="RMSExportOptionSelectModal(item,RMSExportModal)"  >Export</button></td>
+                              </tr>
+                            </table> 
+                        
+                         
+                    </div>
+                  </mk-box>   
+                </div>
+            </div>    
+            </div>
+            <div class="box-footer" *ngIf="is_completed == 1">
+                <div>
+                  <button type="button" (click)="validateTab(0)" class="btn btn-default">Previous</button>
+                  <button type="button" class="btn btn-info pull-right" (click)="CompleteConfirmModal(CompleteModaltemplate)"   >Complete</button>
+                </div>
+            </div> 
+
+          </div>
+          
+          <ng-template #NoValidData>
+              <h4>Please complete step1</h4>
+          </ng-template>
+          
+          <ng-template #NoDataFound>
+              <h4>No data found...</h4>
+          </ng-template>
+
+        </div>
+      </tab>
+    </tabset>
+  </div>
+  </div>
+
+ 
+
+<ng-template #template>
+  <div class="modal-body text-center">
+    <p>Do you want to confirm?</p>
+    
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-success" (click)="MakeDefault()" >Yes</button>
+    <button type="button" class="btn btn-danger" (click)="CloseDefualtConfirmModal()" >No</button>
+  </div>
+</ng-template>
+
+<ng-template #CompleteModaltemplate>
+  <div class="modal-body text-center">
+    <p>Do you want to complete?</p>
+    
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-success" (click)="completeRmsRun()" >Yes</button>
+    <button type="button" class="btn btn-danger" (click)="CloseModal()" >No</button>
+  </div>
+</ng-template>
+
+
+
+<ng-template #RMSExportModal>
+  
+    <div class="modal-content">
+        
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">Please select option to Export</h4>
+        </div>
+
+        <div class="modal-body">
+            <form [formGroup]="RMSExportFilterForm" class="form-horizontal" (ngSubmit)="exportRMSRunXLSX()"  >
+                <div class="row">
+                    <div class="col-md-10 col-xs-12"> 
+                    <table >
+                        <tr>
+                        <label class="radio-inline">
+                        <input type="radio" value="2" formControlName="RMSExportFilterCheckBox" name="RMSExportFilterCheckBox"  >All
+                        </label>
+                        </tr>
+                        <tr>
+                        <label class="radio-inline">
+                        <input type="radio" value="0" formControlName="RMSExportFilterCheckBox" name="RMSExportFilterCheckBox">Matched Records
+                        </label>
+                        </tr>
+                        <tr>
+                        <label class="radio-inline">
+                        <input type="radio" value="1" formControlName="RMSExportFilterCheckBox" name="RMSExportFilterCheckBox">Not Matched Records
+                        </label>
+                        
+                        <div *ngIf="is_submitted_rms_export_form && RMSExportFilterFormData.RMSExportFilterCheckBox.errors" class="invalid-feedback">
+                                <div *ngIf="RMSExportFilterFormData.RMSExportFilterCheckBox.errors.required" style="color: red;" >Please select option</div>
+                        </div>
+
+                    </table>
+                </div>
+                </div>
+    
+                <div class="modal-footer">
+                <button type="submit" class="btn btn-success"  >Submit</button>
+                <button type="button" class="btn btn-danger" (click)="CloseModal()" >Cancel</button>
+                </div>
+            </form>
+        </div>
+        
+    </div>
+              
+</ng-template>
+
+
+
+<ng-template #ValidateExportModal>
+  
+        <div class="modal-content">
+            
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Please select option to Export</h4>
+            </div>
+    
+            <div class="modal-body">
+                <form [formGroup]="ValidateExportFilterForm" class="form-horizontal" (ngSubmit)="exportValidationRunXLSX()"  >
+                    <div class="row">
+                        <div class="col-md-10 col-xs-12"> 
+                        <table >
+                            <tr>
+                            <label class="radio-inline">
+                            <input type="radio" value="2" formControlName="ValidateExportFilterCheckBox" name="ValidateExportFilterCheckBox" >All
+                            </label>
+                            </tr>
+                            <tr>
+                            <label class="radio-inline">
+                            <input type="radio" value="0" formControlName="ValidateExportFilterCheckBox" name="ValidateExportFilterCheckBox" >Valid Records
+                            </label>
+                            </tr>
+                            <tr>
+                            <label class="radio-inline">
+                            <input type="radio" value="1" formControlName="ValidateExportFilterCheckBox" name="ValidateExportFilterCheckBox" >Rejected Records
+                            </label>
+                            <div *ngIf="is_submitted_validate_export_form && ValidateExportFilterFormData.ValidateExportFilterCheckBox.errors" class="invalid-feedback">
+                                    <div *ngIf="ValidateExportFilterFormData.ValidateExportFilterCheckBox.errors.required" style="color: red;" >Please select option</div>
+                                </div>
+                        </table>
+                    </div>
+                    </div>
+        
+                    <div class="modal-footer">
+                    <button type="submit" class="btn btn-success"  >Submit</button>
+                    <button type="button" class="btn btn-danger" (click)="CloseModal()" >Cancel</button>
+                    </div>
+                </form>
+            </div>
+            
+        </div>
+                  
+    </ng-template>
+
+
+
+<ng-template #Hiphen>
+    <p>--</p>
+</ng-template> 

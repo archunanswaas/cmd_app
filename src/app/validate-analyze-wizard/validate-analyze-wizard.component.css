@@ -1,0 +1,17 @@
+.checkbox input:before {
+    /* content: ''; */
+    background: #fff;
+    display: block;
+    width: 20px;
+    height: 20px;
+    border: 1px solid black;
+  }
+
+  .checkbox input:checked:before {
+    background-color: green;
+  }
+
+  .form-group.required .control-label:after {
+    content:"*";
+    color:red;
+  }
